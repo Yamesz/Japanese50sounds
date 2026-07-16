@@ -1133,12 +1133,14 @@ function updateUI() {
   }
 
   if (state.isWeakReviewMode) {
-    weakReviewBanner.style.display = 'block';
-    weakReviewCount.textContent = state.learningQueue.length + (state.currentCard ? 1 : 0);
-    modeBanner.style.display = 'none';
+    if (typeof weakReviewBanner !== 'undefined' && weakReviewBanner) weakReviewBanner.style.display = 'block';
+    if (typeof weakReviewCount !== 'undefined' && weakReviewCount) weakReviewCount.textContent = state.learningQueue.length + (state.currentCard ? 1 : 0);
+    const modeBanner = document.getElementById('modeBanner');
+    if (modeBanner) modeBanner.style.display = 'none';
   } else {
-    weakReviewBanner.style.display = 'none';
-    modeBanner.style.display = 'block';
+    if (typeof weakReviewBanner !== 'undefined' && weakReviewBanner) weakReviewBanner.style.display = 'none';
+    const modeBanner = document.getElementById('modeBanner');
+    if (modeBanner) modeBanner.style.display = 'block';
   }
 }
 
@@ -1631,46 +1633,46 @@ init();
   const statsSidebar = document.querySelector('.stats-sidebar');
 
   function openDrawer() {
-    mobileDrawer.style.display = 'flex';
-    // Force browser reflow to trigger transition
-    setTimeout(() => {
-      mobileDrawer.classList.add('active');
-    }, 10);
+    mobileDrawer.classList.add('active');
   }
 
   function closeDrawer() {
-    if (!mobileDrawer.classList.contains('active')) return;
     mobileDrawer.classList.remove('active');
-    setTimeout(() => {
-      if (!mobileDrawer.classList.contains('active')) {
-        mobileDrawer.style.display = 'none';
-      }
-    }, 300);
   }
 
-  if (menuToggleBtn) menuToggleBtn.addEventListener('click', openDrawer);
-  if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
-  if (mobileDrawerBackdrop) mobileDrawerBackdrop.addEventListener('click', closeDrawer);
+  if (menuToggleBtn) {
+    menuToggleBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      openDrawer();
+    });
+  }
+  if (closeDrawerBtn) {
+    closeDrawerBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeDrawer();
+    });
+  }
+  if (mobileDrawerBackdrop) {
+    mobileDrawerBackdrop.addEventListener('click', closeDrawer);
+  }
 
   // Responsive sidebar movement logic
   function handleResponsiveLayout() {
     const isMobile = window.innerWidth <= 768;
     if (isMobile) {
       // Move the sidebars into the drawer panel body
-      if (configSidebar.parentNode !== mobileDrawerBody) {
+      if (configSidebar && configSidebar.parentNode !== mobileDrawerBody) {
         mobileDrawerBody.appendChild(configSidebar);
       }
-      if (statsSidebar.parentNode !== mobileDrawerBody) {
+      if (statsSidebar && statsSidebar.parentNode !== mobileDrawerBody) {
         mobileDrawerBody.appendChild(statsSidebar);
       }
     } else {
-      // Restore them to their original slots in the grid container on desktop
-      if (configSidebar.parentNode !== appContainer) {
-        // config-sidebar should be the first child (before learning-arena)
+      // Restore them to the grid container on desktop
+      if (configSidebar && configSidebar.parentNode !== appContainer) {
         appContainer.insertBefore(configSidebar, appContainer.firstChild);
       }
-      if (statsSidebar.parentNode !== appContainer) {
-        // stats-sidebar should be the last child
+      if (statsSidebar && statsSidebar.parentNode !== appContainer) {
         appContainer.appendChild(statsSidebar);
       }
       closeDrawer();
@@ -1678,7 +1680,6 @@ init();
   }
 
   window.addEventListener('resize', handleResponsiveLayout);
-  // Initial run
   handleResponsiveLayout();
 })();
 

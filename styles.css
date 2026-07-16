@@ -167,12 +167,14 @@ header {
   z-index: 200;
   display: flex;
   justify-content: flex-end;
+  visibility: hidden;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .mobile-drawer.active {
+  visibility: visible;
   opacity: 1;
   pointer-events: auto;
 }
