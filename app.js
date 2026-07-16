@@ -764,8 +764,10 @@ function nextCard() {
   romajiInput.value = '';
   romajiInput.disabled = false;
   submitBtn.textContent = '送出';
-  feedbackBox.className = 'feedback-box';
-  feedbackBox.textContent = '';
+  if (feedbackBox) {
+    feedbackBox.className = 'feedback-box';
+    feedbackBox.textContent = '';
+  }
   
   // Update Display
   cardKanaDisplay.textContent = state.currentCard.displayKana;
@@ -918,8 +920,10 @@ function checkAnswer(isTimeout = false) {
   
   if (isCorrect) {
     // Answer is Correct
-    feedbackBox.className = 'feedback-box correct show';
-    feedbackBox.textContent = '答對了！非常棒！';
+    if (feedbackBox) {
+      feedbackBox.className = 'feedback-box correct show';
+      feedbackBox.textContent = '答對了！非常棒！';
+    }
     submitBtn.textContent = '下一張';
     
     // Add success styling feedback to card wrapper temporarily
@@ -958,10 +962,12 @@ function checkAnswer(isTimeout = false) {
     }
   } else {
     // Answer is Incorrect
-    feedbackBox.className = 'feedback-box incorrect show';
-    feedbackBox.textContent = isTimeout 
-      ? `⏳ 時間到！正確答案是: ${state.currentCard.romaji}`
-      : `答錯了！正確答案是: ${state.currentCard.romaji}`;
+    if (feedbackBox) {
+      feedbackBox.className = 'feedback-box incorrect show';
+      feedbackBox.textContent = isTimeout 
+        ? `⏳ 時間到！正確答案是: ${state.currentCard.romaji}`
+        : `答錯了！正確答案是: ${state.currentCard.romaji}`;
+    }
     submitBtn.textContent = '繼續';
     
     // Shake animation
