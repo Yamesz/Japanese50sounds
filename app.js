@@ -763,7 +763,7 @@ function nextCard() {
   // Reset input and feedback
   romajiInput.value = '';
   romajiInput.disabled = false;
-  submitBtn.textContent = '確認答案';
+  submitBtn.textContent = '送出';
   feedbackBox.className = 'feedback-box';
   feedbackBox.textContent = '';
   
@@ -920,7 +920,7 @@ function checkAnswer(isTimeout = false) {
     // Answer is Correct
     feedbackBox.className = 'feedback-box correct show';
     feedbackBox.textContent = '答對了！非常棒！';
-    submitBtn.textContent = '下一張 (Enter)';
+    submitBtn.textContent = '下一張';
     
     // Add success styling feedback to card wrapper temporarily
     cardWrapper.classList.add('animate-pop');
@@ -962,7 +962,7 @@ function checkAnswer(isTimeout = false) {
     feedbackBox.textContent = isTimeout 
       ? `⏳ 時間到！正確答案是: ${state.currentCard.romaji}`
       : `答錯了！正確答案是: ${state.currentCard.romaji}`;
-    submitBtn.textContent = '繼續 (Enter)';
+    submitBtn.textContent = '繼續';
     
     // Shake animation
     cardWrapper.classList.add('animate-shake');
@@ -1364,9 +1364,11 @@ submitBtn.addEventListener('click', (e) => {
   }
 });
 
-skipBtn.addEventListener('click', () => {
-  skipCard();
-});
+if (skipBtn) {
+  skipBtn.addEventListener('click', () => {
+    skipCard();
+  });
+}
 
 // Play audio button — only plays sound
 playAudioBtn.addEventListener('click', (e) => {
