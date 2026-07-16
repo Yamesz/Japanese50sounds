@@ -1337,14 +1337,14 @@ deselectAllRowsBtn.addEventListener('click', () => {
 
 // Text Input Events
 romajiInput.addEventListener('focus', () => {
-  if (window.innerWidth <= 768) {
-    // Force scroll to top so the aggressively shrunken flashcard stays in view
+  if (window.innerWidth <= 768 && cardWrapper) {
+    // Force scroll to cardWrapper so it stays in view when keyboard pops up
     setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      cardWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 150);
     // Double check slightly later for some Android keyboards that are slow to animate
     setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      cardWrapper.scrollIntoView({ behavior: 'auto', block: 'start' });
     }, 400);
   }
 });
