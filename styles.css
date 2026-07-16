@@ -1496,28 +1496,20 @@ body.light-theme .timer-track {
   /* Compact the interaction panel */
   .interaction-panel {
     gap: 0.4rem;
-    padding: 0.5rem;
+    padding: 0.5rem !important;
   }
 
   .romaji-input {
-    padding: 0.75rem 1rem;
-    font-size: 1.1rem;
+    padding: 0.6rem 0.8rem;
+    font-size: 1rem;
   }
 
-  .primary-btn,
-  .secondary-btn {
-    padding: 0.75rem;
+  .input-row .primary-btn {
+    padding: 0.6rem 0.5rem;
   }
 
   /* Prevent overlap of metadata and word association by unlocking absolute layout on small viewports */
-  .back-bottom-row {
-    position: static !important;
-    margin-top: 0.25rem;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .back-middle-row {
+  .back-content-row {
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
     gap: 0.4rem;
@@ -1533,7 +1525,7 @@ body.light-theme .timer-track {
     /* Slightly smaller size so they fit neatly in 130px height */
   }
 
-  .vocab-association-container {
+  .vocab-inline {
     padding: 0.25rem 0.5rem;
   }
 
