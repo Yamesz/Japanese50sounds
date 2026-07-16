@@ -17,17 +17,17 @@ let state = {
   weakReviewOriginalQueue: [],
   weakReviewOriginalCard: null,
   cardStartTime: 0,
-  
+
   // Queues
   activeDeck: [], // Filtered set of cards based on settings
   learningQueue: [], // Shuffled active list of cards to learn
   currentCard: null,
   cardState: 'front', // 'front' | 'back'
-  
+
   // Incorrect / Review Queue (Anki logic)
   // Format: cardId -> { id, incorrectCount, consecutiveCorrect }
-  incorrectCards: {}, 
-  
+  incorrectCards: {},
+
   // Stats
   totalAttempts: 0,
   correctAttempts: 0,
@@ -135,7 +135,7 @@ const seionChartData = [
   { label: 'や行', chars: ['や', '', 'ゆ', '', 'よ'] },
   { label: 'ら行', chars: ['ら', 'り', 'る', 'れ', 'ろ'] },
   { label: 'わ行', chars: ['わ', '', '', '', 'を'] },
-  { label: 'ん',   chars: ['ん', '', '', '', ''] }
+  { label: 'ん', chars: ['ん', '', '', '', ''] }
 ];
 
 const dakuonChartData = [
@@ -162,11 +162,11 @@ const yoonChartData = [
 
 function renderModalChart() {
   modalChartBody.innerHTML = '';
-  
+
   let rows = [];
   let cols = 0;
   let headers = [];
-  
+
   if (modalState.tab === 'seion') {
     rows = seionChartData;
     cols = 6;
@@ -180,10 +180,10 @@ function renderModalChart() {
     cols = 4;
     headers = ["行", "ya (ゃ)", "yu (ゅ)", "yo (ょ)"];
   }
-  
+
   const grid = document.createElement('div');
   grid.className = `chart-grid chart-grid-${cols}col`;
-  
+
   // Render Headers
   headers.forEach(h => {
     const cell = document.createElement('div');
@@ -191,7 +191,7 @@ function renderModalChart() {
     cell.textContent = h;
     grid.appendChild(cell);
   });
-  
+
   // Render Rows
   rows.forEach(rowInfo => {
     // 1. Row label
@@ -199,11 +199,11 @@ function renderModalChart() {
     labelCell.className = 'chart-cell header-cell';
     labelCell.textContent = rowInfo.label;
     grid.appendChild(labelCell);
-    
+
     // 2. Row chars
     rowInfo.chars.forEach(char => {
       const cell = document.createElement('div');
-      
+
       if (!char) {
         cell.className = 'chart-cell empty-cell';
       } else {
@@ -211,7 +211,7 @@ function renderModalChart() {
         const match = KANA_DATA.find(k => k.hiragana === char);
         if (match) {
           cell.className = 'chart-cell';
-          
+
           // Display character based on mode
           let displayChar = '';
           if (modalState.kanaMode === 'hiragana') {
@@ -221,12 +221,12 @@ function renderModalChart() {
           } else {
             displayChar = `${match.hiragana} <span style="font-size:0.9rem; font-weight:400; color:var(--text-secondary);">/ ${match.katakana}</span>`;
           }
-          
+
           cell.innerHTML = `
             <div class="chart-cell-char">${displayChar}</div>
             <div class="chart-cell-romaji">${match.romaji}</div>
           `;
-          
+
           cell.addEventListener('click', () => {
             speak(match.hiragana);
             cell.classList.add('animate-pop');
@@ -240,7 +240,7 @@ function renderModalChart() {
       grid.appendChild(cell);
     });
   });
-  
+
   modalChartBody.appendChild(grid);
 }
 
@@ -263,7 +263,7 @@ function loadVoices() {
     systemVoices = window.speechSynthesis.getVoices();
     // Prioritize Japanese voices
     const jaVoices = systemVoices.filter(voice => voice.lang === 'ja-JP' || voice.lang.startsWith('ja') || voice.lang.includes('JP'));
-    
+
     // Populate voice dropdown select element if available
     const voiceSelect = document.getElementById('voiceSelect');
     if (voiceSelect) {
@@ -285,7 +285,7 @@ function loadVoices() {
         });
       }
     }
-    
+
     // Set selectedVoice based on state or fallback
     if (state.selectedVoiceName) {
       selectedVoice = systemVoices.find(voice => voice.name === state.selectedVoiceName);
@@ -307,47 +307,47 @@ function speak(text) {
   // Try to use browser's native speech synthesis first
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
-    
+
     // Check if a Japanese voice is actually available
     const systemVoices = window.speechSynthesis.getVoices();
     const jaVoices = systemVoices.filter(voice => voice.lang === 'ja-JP' || voice.lang.startsWith('ja') || voice.lang.includes('JP'));
-    
+
     if (jaVoices.length > 0) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ja-JP';
-      
+
       let rate = parseFloat(state.voiceSpeed);
       if (isNaN(rate) || rate <= 0) {
         rate = 0.85;
       }
       utterance.rate = rate;
-      
+
       if (selectedVoice) {
         utterance.voice = selectedVoice;
       }
-      
+
       utterance.onstart = () => {
         if (speechWave) speechWave.style.display = 'inline-flex';
         if (playAudioBtn) playAudioBtn.classList.add('speaking');
       };
-      
+
       utterance.onend = () => {
         if (speechWave) speechWave.style.display = 'none';
         if (playAudioBtn) playAudioBtn.classList.remove('speaking');
       };
-      
+
       utterance.onerror = () => {
         if (speechWave) speechWave.style.display = 'none';
         if (playAudioBtn) playAudioBtn.classList.remove('speaking');
         // If native speech fails, try fallback
         speakOnlineFallback(text);
       };
-      
+
       window.speechSynthesis.speak(utterance);
       return;
     }
   }
-  
+
   // If native speech synthesis is not supported or has no Japanese voices, use Google Translate TTS fallback
   speakOnlineFallback(text);
 }
@@ -356,34 +356,34 @@ function speakOnlineFallback(text) {
   if (audioFallback) {
     try {
       audioFallback.pause();
-    } catch (e) {}
+    } catch (e) { }
   }
-  
+
   const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ja&q=${encodeURIComponent(text)}`;
   audioFallback = new Audio(url);
-  
+
   let rate = parseFloat(state.voiceSpeed);
   if (isNaN(rate) || rate <= 0) {
     rate = 0.85;
   }
   audioFallback.playbackRate = rate;
-  
+
   audioFallback.onplay = () => {
     if (speechWave) speechWave.style.display = 'inline-flex';
     if (playAudioBtn) playAudioBtn.classList.add('speaking');
   };
-  
+
   audioFallback.onended = () => {
     if (speechWave) speechWave.style.display = 'none';
     if (playAudioBtn) playAudioBtn.classList.remove('speaking');
   };
-  
+
   audioFallback.onerror = () => {
     if (speechWave) speechWave.style.display = 'none';
     if (playAudioBtn) playAudioBtn.classList.remove('speaking');
     console.error('Online TTS fallback failed.');
   };
-  
+
   audioFallback.play().catch(err => {
     if (speechWave) speechWave.style.display = 'none';
     if (playAudioBtn) playAudioBtn.classList.remove('speaking');
@@ -403,37 +403,37 @@ async function loadStrokeSvg(char, targetEl, animate = false) {
   targetEl.innerHTML = '';
   const url = getKanjiVgUrl(char);
   if (!url) return;
-  
+
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Network error');
     let svgText = await response.text();
-    
+
     // Extract SVG tag and content only, stripping XML header/DTD to prevent raw DTD markup like ]> from printing
     const svgStart = svgText.indexOf('<svg');
     if (svgStart !== -1) {
       svgText = svgText.substring(svgStart);
     }
-    
+
     // Remove standard inline styling styles to override custom ones
     svgText = svgText.replace(/style="[^"]*"/g, '');
     targetEl.innerHTML = svgText;
-    
+
     const svg = targetEl.querySelector('svg');
     if (svg) {
       svg.style.stroke = 'var(--accent-purple)';
       svg.style.strokeWidth = '3.5';
       svg.style.fill = 'none';
-      
+
       // Remove stroke order number labels (KanjiVG <text> elements)
       svg.querySelectorAll('text').forEach(t => t.remove());
-      
+
       const paths = svg.querySelectorAll('path');
       paths.forEach((path, index) => {
         const length = path.getTotalLength();
         path.style.strokeDasharray = length;
         path.style.strokeDashoffset = length;
-        
+
         if (animate) {
           const speed = state.strokeSpeed || 1.5;
           const duration = (0.9 / speed).toFixed(2);
@@ -456,7 +456,7 @@ function loadFromLocalStorage() {
   if (savedState) {
     try {
       const parsed = JSON.parse(savedState);
-      
+
       // Load configuration preferences
       if (parsed.kanaType) state.kanaType = parsed.kanaType;
       if (parsed.selectedSoundTypes) state.selectedSoundTypes = parsed.selectedSoundTypes;
@@ -468,7 +468,7 @@ function loadFromLocalStorage() {
       if (parsed.voiceSpeed !== undefined) state.voiceSpeed = parsed.voiceSpeed;
       if (parsed.strokeSpeed !== undefined) state.strokeSpeed = parsed.strokeSpeed;
       if (parsed.selectedVoiceName !== undefined) state.selectedVoiceName = parsed.selectedVoiceName;
-      
+
       // Load statistics & incorrect reviews
       if (parsed.incorrectCards) state.incorrectCards = parsed.incorrectCards;
       if (parsed.totalAttempts !== undefined) state.totalAttempts = parsed.totalAttempts;
@@ -507,10 +507,10 @@ function getFilteredCards() {
   return KANA_DATA.filter(card => {
     // 1. Filter by sound types (seion, dakuon, etc.)
     if (!state.selectedSoundTypes.includes(card.type)) return false;
-    
+
     // 2. Filter by row selection
     if (!state.selectedRows.includes(card.row)) return false;
-    
+
     return true;
   });
 }
@@ -519,7 +519,7 @@ function getFilteredCards() {
 function generateDeck() {
   const filtered = getFilteredCards();
   state.activeDeck = [];
-  
+
   // Expand active deck for Hiragana / Katakana / Both options
   filtered.forEach(card => {
     if (state.kanaType === 'hiragana' || state.kanaType === 'both') {
@@ -547,19 +547,19 @@ function rebuildQueuePreservingCurrent() {
   const isCurrentCardValid = state.currentCard && state.activeDeck.some(
     card => card.id === state.currentCard.id && card.displayKana === state.currentCard.displayKana
   );
-  
+
   if (isCurrentCardValid) {
     // Re-shuffle the remaining cards in activeDeck (excluding currentCard) to form learningQueue
     const remainingCards = state.activeDeck.filter(
       card => !(card.id === state.currentCard.id && card.displayKana === state.currentCard.displayKana)
     );
-    
+
     // Shuffle remaining cards
     for (let i = remainingCards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [remainingCards[i], remainingCards[j]] = [remainingCards[j], remainingCards[i]];
     }
-    
+
     state.learningQueue = remainingCards;
   } else {
     // If no current card or current card is invalid, shuffle all active cards
@@ -581,20 +581,20 @@ function startCountdownTimer() {
     timerTrack.style.display = 'none';
     return;
   }
-  
+
   timerTrack.style.display = 'block';
   timerFill.style.transition = 'none';
   timerFill.style.width = '100%';
-  
+
   // Force reflow and apply transition in next frame
   requestAnimationFrame(() => {
     timerFill.style.transition = 'width 5s linear';
     timerFill.style.width = '0%';
   });
-  
+
   const limit = 5000;
   const startTime = Date.now();
-  
+
   timerInterval = setInterval(() => {
     const elapsed = Date.now() - startTime;
     if (elapsed >= limit) {
@@ -631,7 +631,7 @@ function initCanvas() {
   drawingCanvas.height = rect.height * dpr;
   canvasCtx = drawingCanvas.getContext('2d');
   canvasCtx.scale(dpr, dpr);
-  
+
   canvasCtx.strokeStyle = '#ec4899'; // accent-pink
   canvasCtx.lineWidth = 3.5;
   canvasCtx.lineCap = 'round';
@@ -678,12 +678,12 @@ function toggleCanvas() {
 function startWeakReview() {
   const weakIds = Object.keys(state.incorrectCards);
   if (weakIds.length === 0) return;
-  
+
   state.isWeakReviewMode = true;
   state.weakReviewOriginalDeck = [...state.activeDeck];
   state.weakReviewOriginalQueue = [...state.learningQueue];
   state.weakReviewOriginalCard = state.currentCard;
-  
+
   const weakCardsMap = [];
   weakIds.forEach(id => {
     const cardEntry = state.incorrectCards[id].card;
@@ -696,7 +696,7 @@ function startWeakReview() {
       });
     }
   });
-  
+
   state.activeDeck = weakCardsMap;
   state.learningQueue = [...state.activeDeck];
   // Shuffle queue
@@ -704,7 +704,7 @@ function startWeakReview() {
     const j = Math.floor(Math.random() * (i + 1));
     [state.learningQueue[i], state.learningQueue[j]] = [state.learningQueue[j], state.learningQueue[i]];
   }
-  
+
   state.currentCard = null;
   nextCard();
 }
@@ -714,11 +714,11 @@ function exitWeakReview(completed = false) {
   state.activeDeck = state.weakReviewOriginalDeck || [];
   state.learningQueue = state.weakReviewOriginalQueue || [];
   state.currentCard = state.weakReviewOriginalCard;
-  
+
   if (completed) {
     alert('🎉 恭喜！您已成功消滅所有錯題！回到主學習區。');
   }
-  
+
   renderRowFilters();
   generateDeck();
   nextCard();
@@ -743,23 +743,23 @@ function nextCard() {
     // Re-shuffle to keep practicing
     rebuildQueuePreservingCurrent();
   }
-  
+
   // Flip card back to front
   flipCard('front');
-  
+
   // Close handwriting canvas overlay
   if (canvasContainer) {
     canvasContainer.style.display = 'none';
   }
-  
+
   // Hide vocab & stroke containers, clear result state
   if (vocabContainer) vocabContainer.style.display = 'none';
   if (cardBack) cardBack.classList.remove('result-correct', 'result-incorrect');
   if (strokeAnimContainer) strokeAnimContainer.style.display = 'none';
-  
+
   // Pop next card
   state.currentCard = state.learningQueue.shift();
-  
+
   // Reset input and feedback
   romajiInput.value = '';
   romajiInput.disabled = false;
@@ -768,20 +768,20 @@ function nextCard() {
     feedbackBox.className = 'feedback-box';
     feedbackBox.textContent = '';
   }
-  
+
   // Update Display
   cardKanaDisplay.textContent = state.currentCard.displayKana;
   cardKanaTypeHint.textContent = state.currentCard.kanaTypeLabel;
-  
+
   const typeText = {
     seion: '清音',
     dakuon: '濁音',
     handakuon: '半濁音',
     yoon: '拗音'
   }[state.currentCard.type];
-  
+
   cardGroupHint.textContent = `${ROW_LABELS[state.currentCard.row] || state.currentCard.row} | ${typeText}`;
-  
+
   // Clear Back Face info during rotation back to front to prevent answer leaks
   cardAnswerDisplay.textContent = '';
   cardAnswerDisplay.innerHTML = '';
@@ -792,13 +792,13 @@ function nextCard() {
   if (backKatakanaChip) backKatakanaChip.style.display = 'flex';
   if (backRomajiLabel) backRomajiLabel.textContent = '';
   if (vocabContainer) vocabContainer.style.display = 'none';
-  
+
   updateUI();
-  
+
   // Start timers
   startCountdownTimer();
   state.cardStartTime = Date.now();
-  
+
   // Focus input
   setTimeout(() => romajiInput.focus(), 50);
 }
@@ -817,7 +817,7 @@ function flipCard(face) {
 // Check Romaji answer
 function checkAnswer(isTimeout = false) {
   if (!state.currentCard) return;
-  
+
   const userInput = romajiInput.value.trim().toLowerCase();
   if (userInput === '' && !isTimeout) {
     // Shaking alert for empty input
@@ -825,21 +825,21 @@ function checkAnswer(isTimeout = false) {
     setTimeout(() => cardWrapper.classList.remove('animate-shake'), 400);
     return;
   }
-  
+
   // Stop timer countdown
   stopCountdownTimer();
-  
+
   const reactionTime = ((Date.now() - state.cardStartTime) / 1000).toFixed(2);
-  
-  const isCorrect = !isTimeout && (userInput === state.currentCard.romaji || 
-                    (state.currentCard.alternatives && state.currentCard.alternatives.includes(userInput)));
-  
+
+  const isCorrect = !isTimeout && (userInput === state.currentCard.romaji ||
+    (state.currentCard.alternatives && state.currentCard.alternatives.includes(userInput)));
+
   // Update stats
   state.totalAttempts++;
   if (isCorrect) {
     state.correctAttempts++;
   }
-  
+
   // Populate back face details right before flipping
   const typeText = {
     seion: '清音',
@@ -847,14 +847,14 @@ function checkAnswer(isTimeout = false) {
     handakuon: '半濁音',
     yoon: '拗音'
   }[state.currentCard.type];
-  
+
   // Reset and update text contents, ensuring both chips are visible by default
   if (backHiragana) backHiragana.textContent = state.currentCard.hiragana;
   if (backKatakana) backKatakana.textContent = state.currentCard.katakana;
   if (backHiraganaChip) backHiraganaChip.style.display = 'flex';
   if (backKatakanaChip) backKatakanaChip.style.display = 'flex';
   if (backRomajiLabel) backRomajiLabel.textContent = state.currentCard.romaji;
-  
+
   // Show stroke order animation when correct, romaji when incorrect
   if (isCorrect) {
     cardAnswerDisplay.textContent = '';
@@ -867,7 +867,7 @@ function checkAnswer(isTimeout = false) {
       cardAnswerDisplay.classList.remove('stroke-center');
       cardAnswerDisplay.textContent = state.currentCard.displayKana;
     }
-    
+
     // Hide the redundant tag that is already shown in the center stroke order animation
     if (state.currentCard.displayKana === state.currentCard.hiragana) {
       if (backHiraganaChip) backHiraganaChip.style.display = 'none';
@@ -878,18 +878,18 @@ function checkAnswer(isTimeout = false) {
     cardAnswerDisplay.classList.remove('stroke-center');
     cardAnswerDisplay.textContent = state.currentCard.romaji;
   }
-  
+
   // Set ghost kana watermark
   if (backKanaGhost) {
     backKanaGhost.textContent = state.currentCard.displayKana;
   }
-  
+
   // Set result state class on card-back
   if (cardBack) {
     cardBack.classList.remove('result-correct', 'result-incorrect');
     cardBack.classList.add(isCorrect ? 'result-correct' : 'result-incorrect');
   }
-  
+
   // Display reaction time inside back answers label
   const backAnswerLabel = document.getElementById('backAnswerLabel');
   if (isCorrect) {
@@ -900,13 +900,13 @@ function checkAnswer(isTimeout = false) {
 
   // Flip card to reveal details
   flipCard('back');
-  
+
   // Disable input during card reveal
   romajiInput.disabled = true;
-  
+
   // Hide separate stroke container in bottom row (stroke is shown in center now)
   if (strokeAnimContainer) strokeAnimContainer.style.display = 'none';
-  
+
   // Load Vocabulary association into right column
   if (vocabContainer) {
     if (state.currentCard.vocab) {
@@ -917,7 +917,7 @@ function checkAnswer(isTimeout = false) {
       vocabContainer.style.display = 'none';
     }
   }
-  
+
   if (isCorrect) {
     // Answer is Correct
     if (feedbackBox) {
@@ -925,11 +925,11 @@ function checkAnswer(isTimeout = false) {
       feedbackBox.textContent = '答對了！非常棒！';
     }
     submitBtn.textContent = '下一張';
-    
+
     // Add success styling feedback to card wrapper temporarily
     cardWrapper.classList.add('animate-pop');
     setTimeout(() => cardWrapper.classList.remove('animate-pop'), 450);
-    
+
     // Anki/Spaced repetition updates
     const cardId = state.currentCard.id;
     if (state.incorrectCards[cardId]) {
@@ -937,14 +937,14 @@ function checkAnswer(isTimeout = false) {
       if (state.incorrectCards[cardId].consecutiveCorrect >= 2) {
         // Mastered after 2 consecutive correct answers
         delete state.incorrectCards[cardId];
-        
+
         // Remove from review queue as well if in weak review mode
         if (state.isWeakReviewMode) {
           state.learningQueue = state.learningQueue.filter(
             card => !(card.id === cardId && card.displayKana === state.currentCard.displayKana)
           );
         }
-        
+
         if (!state.masteredCardIds.includes(cardId)) {
           state.masteredCardIds.push(cardId);
         }
@@ -955,7 +955,7 @@ function checkAnswer(isTimeout = false) {
         state.masteredCardIds.push(cardId);
       }
     }
-    
+
     // Auto-pronounce when answer is correct
     if (state.autoPronounceCorrect) {
       speak(state.currentCard.displayKana);
@@ -964,16 +964,16 @@ function checkAnswer(isTimeout = false) {
     // Answer is Incorrect
     if (feedbackBox) {
       feedbackBox.className = 'feedback-box incorrect show';
-      feedbackBox.textContent = isTimeout 
+      feedbackBox.textContent = isTimeout
         ? `⏳ 時間到！正確答案是: ${state.currentCard.romaji}`
         : `答錯了！正確答案是: ${state.currentCard.romaji}`;
     }
     submitBtn.textContent = '繼續';
-    
+
     // Shake animation
     cardWrapper.classList.add('animate-shake');
     setTimeout(() => cardWrapper.classList.remove('animate-shake'), 400);
-    
+
     // Anki logic for incorrect answer:
     const cardId = state.currentCard.id;
     if (state.incorrectCards[cardId]) {
@@ -988,16 +988,16 @@ function checkAnswer(isTimeout = false) {
       };
       state.masteredCardIds = state.masteredCardIds.filter(id => id !== cardId);
     }
-    
+
     // Re-queue card
     const insertIndex = Math.min(3, state.learningQueue.length);
     state.learningQueue.splice(insertIndex, 0, state.currentCard);
-    
+
     if (state.autoPronounce) {
       speak(state.currentCard.displayKana);
     }
   }
-  
+
   saveToLocalStorage();
   updateUI();
   submitBtn.focus();
@@ -1006,7 +1006,7 @@ function checkAnswer(isTimeout = false) {
 // Skip current card
 function skipCard() {
   if (!state.currentCard) return;
-  
+
   // Treat skip as incorrect for review queue purposes
   const cardId = state.currentCard.id;
   if (!state.incorrectCards[cardId]) {
@@ -1018,10 +1018,10 @@ function skipCard() {
     };
     state.masteredCardIds = state.masteredCardIds.filter(id => id !== cardId);
   }
-  
+
   // Re-queue card
   state.learningQueue.push(state.currentCard);
-  
+
   nextCard();
 }
 
@@ -1029,9 +1029,9 @@ function skipCard() {
 function reviewIncorrectCard(cardId) {
   const incorrectEntry = state.incorrectCards[cardId];
   if (!incorrectEntry) return;
-  
+
   const targetCard = incorrectEntry.card;
-  
+
   // Set as current card
   flipCard('front');
   state.currentCard = {
@@ -1040,24 +1040,24 @@ function reviewIncorrectCard(cardId) {
     displayKana: targetCard.displayKana || targetCard.hiragana,
     kanaTypeLabel: targetCard.kanaTypeLabel || (state.kanaType === 'katakana' ? '片假名' : '平假名')
   };
-  
+
   // Reset interaction state
   romajiInput.value = '';
   romajiInput.disabled = false;
   submitBtn.textContent = '確認答案';
   feedbackBox.className = 'feedback-box';
   feedbackBox.textContent = '';
-  
+
   cardKanaDisplay.textContent = state.currentCard.displayKana;
   cardKanaTypeHint.textContent = state.currentCard.kanaTypeLabel;
   const typeText = { seion: '清音', dakuon: '濁音', handakuon: '半濁音', yoon: '拗音' }[state.currentCard.type];
   cardGroupHint.textContent = `${ROW_LABELS[state.currentCard.row] || state.currentCard.row} | ${typeText}`;
-  
+
   // Clear Back Face info during rotation back to front to prevent answer leaks
   cardAnswerDisplay.textContent = '';
   backRowHint.textContent = '';
   backTypeHint.textContent = '';
-  
+
   updateUI();
   setTimeout(() => romajiInput.focus(), 50);
 }
@@ -1068,29 +1068,29 @@ function reviewIncorrectCard(cardId) {
 function updateUI() {
   // 1. Queue count
   queueRemainingText.textContent = state.learningQueue.length;
-  
+
   // 2. Mastered count
   masteredCountText.textContent = state.masteredCardIds.length;
-  
+
   // 3. Accuracy
-  const accuracy = state.totalAttempts > 0 
-    ? Math.round((state.correctAttempts / state.totalAttempts) * 100) 
+  const accuracy = state.totalAttempts > 0
+    ? Math.round((state.correctAttempts / state.totalAttempts) * 100)
     : 0;
   accuracyText.textContent = `${accuracy}%`;
-  
+
   // 4. Progress bar (Mastered / Filtered unique cards in dataset)
   // Get count of unique available cards under active filter rules
   const uniqueCardsCount = state.activeDeck.length;
   const activeDeckIds = state.activeDeck.map(c => c.id);
   const activeMasteredCount = state.masteredCardIds.filter(id => activeDeckIds.includes(id)).length;
-  
-  const progressPercentage = uniqueCardsCount > 0 
-    ? Math.round((activeMasteredCount / uniqueCardsCount) * 100) 
+
+  const progressPercentage = uniqueCardsCount > 0
+    ? Math.round((activeMasteredCount / uniqueCardsCount) * 100)
     : 0;
-  
+
   progressBarPercentage.textContent = `${progressPercentage}%`;
   progressBarFill.style.width = `${progressPercentage}%`;
-  
+
   // 5. Weak review queue listing
   const incorrectEntries = Object.values(state.incorrectCards);
   if (incorrectEntries.length === 0) {
@@ -1100,30 +1100,30 @@ function updateUI() {
     badges.forEach(b => b.remove());
   } else {
     noWeakMsg.style.display = 'none';
-    
+
     // Clear list
     const badges = weakItemsList.querySelectorAll('.weak-badge');
     badges.forEach(b => b.remove());
-    
+
     // Sort by incorrect count descending
     incorrectEntries.sort((a, b) => b.incorrectCount - a.incorrectCount);
-    
+
     incorrectEntries.forEach(entry => {
       const badge = document.createElement('span');
       badge.className = 'weak-badge';
       badge.title = '點擊立即單獨複習';
-      
+
       const charToShow = entry.card.displayKana || entry.card.hiragana;
       badge.innerHTML = `${charToShow} <span class="badge-count">${entry.incorrectCount}次</span>`;
-      
+
       badge.addEventListener('click', () => {
         reviewIncorrectCard(entry.id);
       });
-      
+
       weakItemsList.appendChild(badge);
     });
   }
-  
+
   // Toggle Weak Review Button & Banner
   const weakIdsCount = incorrectEntries.length;
   if (weakIdsCount > 0 && !state.isWeakReviewMode) {
@@ -1131,7 +1131,7 @@ function updateUI() {
   } else {
     startWeakReviewBtn.style.display = 'none';
   }
-  
+
   if (state.isWeakReviewMode) {
     weakReviewBanner.style.display = 'block';
     weakReviewCount.textContent = state.learningQueue.length + (state.currentCard ? 1 : 0);
@@ -1155,7 +1155,7 @@ function renderRowFilters() {
   // Sort rows order nicely (a, ka, sa, ta, na, ha, ma, ya, ra, wa, ga, za, da, ba, pa)
   const rowOrder = ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma', 'ya', 'ra', 'wa', 'ga', 'za', 'da', 'ba', 'pa'];
   const sortedRows = rowOrder.filter(r => availableRows.has(r));
-  
+
   // If state.selectedRows is empty, initialize it with all sortedRows (default checked)
   // Or check if previous selections are still valid, filtering out ones that are no longer available.
   const prevSelected = state.selectedRows;
@@ -1169,13 +1169,13 @@ function renderRowFilters() {
   sortedRows.forEach(rowKey => {
     const label = document.createElement('label');
     label.className = 'checkbox-label';
-    
+
     const isChecked = state.selectedRows.includes(rowKey);
     label.innerHTML = `
       <input type="checkbox" value="${rowKey}" ${isChecked ? 'checked' : ''}>
       <span>${ROW_LABELS[rowKey] || rowKey}</span>
     `;
-    
+
     const checkbox = label.querySelector('input');
     checkbox.addEventListener('change', (e) => {
       if (e.target.checked) {
@@ -1185,7 +1185,7 @@ function renderRowFilters() {
       } else {
         state.selectedRows = state.selectedRows.filter(r => r !== rowKey);
       }
-      
+
       saveToLocalStorage();
       generateDeck();
       if (!state.currentCard) {
@@ -1194,7 +1194,7 @@ function renderRowFilters() {
         updateUI();
       }
     });
-    
+
     rowsCheckboxGrid.appendChild(label);
   });
 }
@@ -1225,14 +1225,14 @@ themeToggleBtn.addEventListener('click', () => {
 kanaTypeSelector.addEventListener('click', (e) => {
   const btn = e.target.closest('.segment-btn');
   if (!btn) return;
-  
+
   // Update UI active state
   kanaTypeSelector.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  
+
   // Update state
   state.kanaType = btn.dataset.type;
-  
+
   saveToLocalStorage();
   generateDeck();
   if (!state.currentCard) {
@@ -1265,18 +1265,18 @@ const soundTypeCheckboxes = [
 soundTypeCheckboxes.forEach(({ el, type }) => {
   el.addEventListener('change', () => {
     const wasChecked = el.checked;
-    
+
     // Collect active sound types
     state.selectedSoundTypes = soundTypeCheckboxes
       .filter(item => item.el.checked)
       .map(item => item.type);
-    
+
     // Ensure at least one sound type is checked
     if (state.selectedSoundTypes.length === 0) {
       el.checked = true;
       state.selectedSoundTypes = [type];
     }
-    
+
     // If a sound type was checked, automatically add its rows to state.selectedRows
     if (wasChecked) {
       const newRows = new Set();
@@ -1291,7 +1291,7 @@ soundTypeCheckboxes.forEach(({ el, type }) => {
         }
       });
     }
-    
+
     saveToLocalStorage();
     renderRowFilters(); // Re-render row selection grid
     generateDeck();
@@ -1334,7 +1334,7 @@ deselectAllRowsBtn.addEventListener('click', () => {
     updateUI();
   }
 });
-
+/*
 // Text Input Events
 romajiInput.addEventListener('focus', () => {
   if (window.innerWidth <= 768 && cardWrapper) {
@@ -1348,7 +1348,7 @@ romajiInput.addEventListener('focus', () => {
     }, 400);
   }
 });
-
+*/
 romajiInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -1387,12 +1387,12 @@ playAudioBtn.addEventListener('click', (e) => {
 // Front face double-click or click to listen/skip
 cardWrapper.addEventListener('click', (e) => {
   // Exclude clicking speech buttons, stroke anim buttons, or vocab info
-  if (e.target.closest('#playAudioBtn') || 
-      e.target.closest('#strokeAnimContainer') || 
-      e.target.closest('#vocabContainer')) {
+  if (e.target.closest('#playAudioBtn') ||
+    e.target.closest('#strokeAnimContainer') ||
+    e.target.closest('#vocabContainer')) {
     return;
   }
-  
+
   // Toggle flip card manually on click (only when answer is shown or skip is clicked)
   if (state.cardState === 'back') {
     // Disabled: only Next/Continue button switches card per user request
@@ -1406,7 +1406,7 @@ resetProgressBtn.addEventListener('click', () => {
     state.totalAttempts = 0;
     state.correctAttempts = 0;
     state.masteredCardIds = [];
-    
+
     saveToLocalStorage();
     generateDeck();
     nextCard();
@@ -1565,14 +1565,14 @@ drawingCanvas.addEventListener('touchend', (e) => {
 function init() {
   // 1. Load data from local storage
   loadFromLocalStorage();
-  
+
   // 2. Set theme
   setTheme(state.theme);
-  
+
   // 3. Update configuration selectors in UI
   autoPronounceCheckbox.checked = state.autoPronounce;
   autoPronounceCorrectCheckbox.checked = state.autoPronounceCorrect;
-  
+
   if (timeChallengeCheckbox) {
     timeChallengeCheckbox.checked = state.timeChallenge;
   }
@@ -1582,7 +1582,7 @@ function init() {
   if (voiceSpeedValue) {
     voiceSpeedValue.textContent = `${(state.voiceSpeed !== undefined ? state.voiceSpeed : 0.85).toFixed(2)}x`;
   }
-  
+
   if (state.strokeSpeed === undefined || state.strokeSpeed === null || isNaN(state.strokeSpeed)) {
     state.strokeSpeed = 1.5;
   }
@@ -1592,7 +1592,7 @@ function init() {
   if (strokeSpeedValue) {
     strokeSpeedValue.textContent = `${state.strokeSpeed.toFixed(2)}x`;
   }
-  
+
   // Set Kana type segment active
   kanaTypeSelector.querySelectorAll('.segment-btn').forEach(btn => {
     if (btn.dataset.type === state.kanaType) {
@@ -1601,16 +1601,16 @@ function init() {
       btn.classList.remove('active');
     }
   });
-  
+
   // Set Sound Type checkboxes
   typeSeionCheckbox.checked = state.selectedSoundTypes.includes('seion');
   typeDakuonCheckbox.checked = state.selectedSoundTypes.includes('dakuon');
   typeHandakuonCheckbox.checked = state.selectedSoundTypes.includes('handakuon');
   typeYoonCheckbox.checked = state.selectedSoundTypes.includes('yoon');
-  
+
   // 4. Render checklist rows
   renderRowFilters();
-  
+
   // 5. Generate learning deck & load first card
   generateDeck();
   nextCard();
