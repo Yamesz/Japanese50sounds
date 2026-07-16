@@ -1619,3 +1619,66 @@ function init() {
 // Run initial startup
 init();
 
+// --- MOBILE DRAWER & RESPONSIVE LAYOUT CONTROLLER ---
+(function setupMobileDrawer() {
+  const menuToggleBtn = document.getElementById('menuToggleBtn');
+  const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+  const mobileDrawer = document.getElementById('mobileDrawer');
+  const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
+  const mobileDrawerBody = document.getElementById('mobileDrawerBody');
+  const appContainer = document.querySelector('.app-container');
+  const configSidebar = document.querySelector('.config-sidebar');
+  const statsSidebar = document.querySelector('.stats-sidebar');
+
+  function openDrawer() {
+    mobileDrawer.style.display = 'flex';
+    // Force browser reflow to trigger transition
+    setTimeout(() => {
+      mobileDrawer.classList.add('active');
+    }, 10);
+  }
+
+  function closeDrawer() {
+    if (!mobileDrawer.classList.contains('active')) return;
+    mobileDrawer.classList.remove('active');
+    setTimeout(() => {
+      if (!mobileDrawer.classList.contains('active')) {
+        mobileDrawer.style.display = 'none';
+      }
+    }, 300);
+  }
+
+  if (menuToggleBtn) menuToggleBtn.addEventListener('click', openDrawer);
+  if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+  if (mobileDrawerBackdrop) mobileDrawerBackdrop.addEventListener('click', closeDrawer);
+
+  // Responsive sidebar movement logic
+  function handleResponsiveLayout() {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      // Move the sidebars into the drawer panel body
+      if (configSidebar.parentNode !== mobileDrawerBody) {
+        mobileDrawerBody.appendChild(configSidebar);
+      }
+      if (statsSidebar.parentNode !== mobileDrawerBody) {
+        mobileDrawerBody.appendChild(statsSidebar);
+      }
+    } else {
+      // Restore them to their original slots in the grid container on desktop
+      if (configSidebar.parentNode !== appContainer) {
+        // config-sidebar should be the first child (before learning-arena)
+        appContainer.insertBefore(configSidebar, appContainer.firstChild);
+      }
+      if (statsSidebar.parentNode !== appContainer) {
+        // stats-sidebar should be the last child
+        appContainer.appendChild(statsSidebar);
+      }
+      closeDrawer();
+    }
+  }
+
+  window.addEventListener('resize', handleResponsiveLayout);
+  // Initial run
+  handleResponsiveLayout();
+})();
+

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>50音日文學習助手 - Gojūon Master</title>
   <meta name="description" content="一個現代化、漂亮的日文50音學習助手，支援單字卡功能（Anki模式）、錯題複習、發音功能與進度追蹤。">
-  <link rel="stylesheet" href="styles.css?v=13">
+  <link rel="stylesheet" href="styles.css?v=15">
 </head>
 
 <body>
@@ -48,6 +48,14 @@
           <line x1="21" y1="12" x2="23" y2="12"></line>
           <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+      <!-- Hamburger Menu Button (Mobile Only) -->
+      <button id="menuToggleBtn" class="theme-toggle-btn hamburger-btn" aria-label="開啟選單" style="margin-left: 0.75rem;">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
     </div>
@@ -362,6 +370,27 @@
 
   </main>
 
+  <!-- Mobile Drawer Menu -->
+  <div id="mobileDrawer" class="mobile-drawer" style="display: none;">
+    <div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop"></div>
+    <div class="mobile-drawer-panel glass-panel">
+      <div class="mobile-drawer-header">
+        <h2 style="font-family: var(--font-display); font-weight: 700; display: flex; align-items: center; gap: 0.5rem; font-size: 1.25rem; margin-bottom: 0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          選單與設定
+        </h2>
+        <button id="closeDrawerBtn" class="close-btn" aria-label="關閉選單" style="font-size: 2rem;">&times;</button>
+      </div>
+      <div class="mobile-drawer-body" id="mobileDrawerBody">
+        <!-- JS will move sidebar panels here on mobile view -->
+      </div>
+    </div>
+  </div>
+
   <!-- Gojūon Reference Chart Modal -->
   <div id="chartModal" class="modal-overlay" style="display: none;">
     <div class="modal-content glass-panel animate-pop">
@@ -401,7 +430,7 @@
   </div>
 
   <script src="kana.js?v=9"></script>
-  <script src="app.js?v=15"></script>
+  <script src="app.js?v=17"></script>
 </body>
 
 </html>

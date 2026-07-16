@@ -152,7 +152,95 @@ header {
   }
 }
 
+/* Hamburger Menu Button (Hidden by default on desktop) */
+.hamburger-btn {
+  display: none;
+}
+
+/* Mobile Drawer Elements styling */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-drawer.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-drawer-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 5, 20, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.mobile-drawer-panel {
+  position: relative;
+  width: 320px;
+  max-width: 85%;
+  height: 100%;
+  background: var(--panel-bg);
+  border-left: 1px solid var(--panel-hover-border);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.25rem !important;
+  border-radius: 0 !important; /* full height flush design */
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 201;
+}
+
+.mobile-drawer.active .mobile-drawer-panel {
+  transform: translateX(0);
+}
+
+.mobile-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.mobile-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-right: 0.25rem;
+}
+
+/* Custom Scrollbar for drawer content area */
+.mobile-drawer-body::-webkit-scrollbar {
+  width: 4px;
+}
+.mobile-drawer-body::-webkit-scrollbar-thumb {
+  background: var(--panel-border);
+  border-radius: 10px;
+}
+
 @media (max-width: 768px) {
+  .hamburger-btn {
+    display: flex;
+  }
+
   .app-container {
     display: flex;
     flex-direction: column;
@@ -165,12 +253,29 @@ header {
     /* Keep the flashcard at the very top of the screen */
   }
 
-  .config-sidebar {
-    order: 2;
+  /* Hide the desktop sidebars on mobile so they only appear inside the drawer */
+  .app-container > .config-sidebar,
+  .app-container > .stats-sidebar {
+    display: none !important;
   }
 
-  .stats-sidebar {
-    order: 3;
+  /* Force sidebars inside mobile drawer to always display correctly */
+  .mobile-drawer-body .config-sidebar,
+  .mobile-drawer-body .stats-sidebar {
+    display: flex !important;
+    flex-direction: column;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Compact spacing for items in the drawer */
+  .mobile-drawer-body .glass-panel:hover {
+    border-color: transparent;
   }
 }
 
