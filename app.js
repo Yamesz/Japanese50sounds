@@ -1620,56 +1620,59 @@ function init() {
 init();
 
 // --- MOBILE VIRTUAL KEYBOARD DETECTION ---
-// Use visualViewport API to detect when virtual keyboard opens/closes on mobile
+// Detects keyboard open on mobile and pins the learning area so the question stays visible.
 (function setupMobileKeyboardDetection() {
-  // Only apply on touch devices with narrow screens (mobile)
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if (!isMobile) return;
+  // Check if this is likely a touch-capable mobile device
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  if (!isTouchDevice) return;
 
-  const initialHeight = window.innerHeight;
   let keyboardOpen = false;
+  const learningArena = document.querySelector('.learning-arena');
 
-  function handleViewportResize() {
-    const viewportHeight = window.visualViewport
-      ? window.visualViewport.height
-      : window.innerHeight;
-
-    // If viewport shrunk by more than 150px, keyboard is likely open
-    const heightDiff = initialHeight - viewportHeight;
-    const isKeyboardNowOpen = heightDiff > 150;
-
-    if (isKeyboardNowOpen && !keyboardOpen) {
-      keyboardOpen = true;
-      document.body.classList.add('keyboard-open');
-
-      // Scroll the flashcard into view so the question is visible
-      requestAnimationFrame(() => {
-        const cardEl = document.getElementById('cardWrapper');
-        if (cardEl) {
-          cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    } else if (!isKeyboardNowOpen && keyboardOpen) {
-      keyboardOpen = false;
-      document.body.classList.remove('keyboard-open');
-    }
+  function openKeyboardMode() {
+    if (keyboardOpen) return;
+    keyboardOpen = true;
+    document.body.classList.add('keyboard-open');
+    // Scroll to top so the fixed card is not offset
+    window.scrollTo(0, 0);
   }
 
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', handleViewportResize);
-  } else {
-    // Fallback for browsers without visualViewport
-    window.addEventListener('resize', handleViewportResize);
+  function closeKeyboardMode() {
+    if (!keyboardOpen) return;
+    keyboardOpen = false;
+    document.body.classList.remove('keyboard-open');
   }
 
-  // Also scroll card into view when input is focused on mobile
+  // Primary signal: input focus/blur
   romajiInput.addEventListener('focus', () => {
-    // Small delay to wait for keyboard to appear
-    setTimeout(() => {
-      const cardEl = document.getElementById('cardWrapper');
-      if (cardEl) {
-        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 300);
+    // Check if screen is narrow enough to be mobile
+    if (window.innerWidth <= 768) {
+      // Small delay to let keyboard animate in
+      setTimeout(openKeyboardMode, 100);
+    }
   });
+
+  romajiInput.addEventListener('blur', () => {
+    // Small delay to avoid flicker if user taps submit then refocuses
+    setTimeout(() => {
+      if (document.activeElement !== romajiInput) {
+        closeKeyboardMode();
+      }
+    }, 200);
+  });
+
+  // Secondary signal: visualViewport resize (backup)
+  if (window.visualViewport) {
+    const initialHeight = window.visualViewport.height;
+    window.visualViewport.addEventListener('resize', () => {
+      if (window.innerWidth > 768) return;
+      const currentHeight = window.visualViewport.height;
+      const heightDiff = initialHeight - currentHeight;
+      if (heightDiff > 150 && !keyboardOpen) {
+        openKeyboardMode();
+      } else if (heightDiff < 100 && keyboardOpen) {
+        closeKeyboardMode();
+      }
+    });
+  }
 })();
