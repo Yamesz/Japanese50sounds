@@ -1618,3 +1618,58 @@ function init() {
 
 // Run initial startup
 init();
+
+// --- MOBILE VIRTUAL KEYBOARD DETECTION ---
+// Use visualViewport API to detect when virtual keyboard opens/closes on mobile
+(function setupMobileKeyboardDetection() {
+  // Only apply on touch devices with narrow screens (mobile)
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (!isMobile) return;
+
+  const initialHeight = window.innerHeight;
+  let keyboardOpen = false;
+
+  function handleViewportResize() {
+    const viewportHeight = window.visualViewport
+      ? window.visualViewport.height
+      : window.innerHeight;
+
+    // If viewport shrunk by more than 150px, keyboard is likely open
+    const heightDiff = initialHeight - viewportHeight;
+    const isKeyboardNowOpen = heightDiff > 150;
+
+    if (isKeyboardNowOpen && !keyboardOpen) {
+      keyboardOpen = true;
+      document.body.classList.add('keyboard-open');
+
+      // Scroll the flashcard into view so the question is visible
+      requestAnimationFrame(() => {
+        const cardEl = document.getElementById('cardWrapper');
+        if (cardEl) {
+          cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    } else if (!isKeyboardNowOpen && keyboardOpen) {
+      keyboardOpen = false;
+      document.body.classList.remove('keyboard-open');
+    }
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleViewportResize);
+  } else {
+    // Fallback for browsers without visualViewport
+    window.addEventListener('resize', handleViewportResize);
+  }
+
+  // Also scroll card into view when input is focused on mobile
+  romajiInput.addEventListener('focus', () => {
+    // Small delay to wait for keyboard to appear
+    setTimeout(() => {
+      const cardEl = document.getElementById('cardWrapper');
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 300);
+  });
+})();
