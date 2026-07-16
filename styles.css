@@ -1361,27 +1361,27 @@ body.light-theme .timer-track {
     gap: 0.5rem;
   }
   
-  /* Shrink the main flashcard */
+  /* Shrink the main flashcard aggressively so it fits above keyboard */
   .card-wrapper {
-    height: 180px;
+    height: 130px;
   }
   
   .card-face {
-    padding: 1rem;
+    padding: 0.5rem;
   }
   
   .card-character {
-    font-size: 4rem;
+    font-size: 3.5rem;
   }
   
   .back-kana-ghost {
-    font-size: 6rem;
+    font-size: 5rem;
   }
   
   /* Compact the interaction panel */
   .interaction-panel {
-    gap: 0.5rem;
-    padding: 0.75rem;
+    gap: 0.4rem;
+    padding: 0.5rem;
   }
   
   .romaji-input {
