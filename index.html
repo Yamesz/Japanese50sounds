@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>50音日文學習助手 - Gojūon Master</title>
   <meta name="description" content="一個現代化、漂亮的日文50音學習助手，支援單字卡功能（Anki模式）、錯題複習、發音功能與進度追蹤。">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body>
 
@@ -206,52 +206,51 @@
             <!-- Status label -->
             <div class="back-status-label" id="backAnswerLabel">羅馬拼音 Rōmaji</div>
 
-            <!-- Main romaji answer -->
-            <div class="back-answer" id="cardAnswerDisplay">a</div>
-
-            <!-- Meta chips row -->
-            <div class="back-meta">
-              <div class="meta-chip">
-                <span class="meta-chip-icon" style="background: rgba(236, 72, 153, 0.12); color: var(--accent-pink);">平</span>
-                <span class="meta-chip-val" id="backHiragana">-</span>
-              </div>
-              <div class="meta-chip">
-                <span class="meta-chip-icon">片</span>
-                <span class="meta-chip-val" id="backKatakana">-</span>
-              </div>
-            </div>
-
-            <!-- Bottom row: audio button + stroke anim + vocab -->
-            <div class="back-bottom-row">
-              <!-- Audio button (Hidden per user request) -->
-              <button class="audio-fab" id="playAudioBtn" aria-label="播放發音" style="display: none;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                </svg>
-                <span class="speech-indicator" id="speechWave" style="display:none;">
-                  <span class="speech-bar"></span>
-                  <span class="speech-bar"></span>
-                  <span class="speech-bar"></span>
-                </span>
-              </button>
-
-              <!-- Stroke order animation -->
-              <div class="stroke-anim-container" id="strokeAnimContainer" style="display: none;" title="點擊播放筆順動畫">
-                <div class="stroke-anim-label">筆順</div>
-                <div id="strokeSvgHolder" style="width: 52px; height: 52px; pointer-events: none; display: flex; align-items: center; justify-content: center;"></div>
+            <!-- Three-column layout: Kana Info | Stroke/Answer | Vocab -->
+            <div class="back-content-row">
+              <!-- Left column: Kana info -->
+              <div class="back-col back-col-left" id="backLeftCol">
+                <div class="meta-chip" id="backHiraganaChip">
+                  <span class="meta-chip-icon" style="background: rgba(236, 72, 153, 0.12); color: var(--accent-pink);">平</span>
+                  <span class="meta-chip-val" id="backHiragana">-</span>
+                </div>
+                <div class="meta-chip" id="backKatakanaChip">
+                  <span class="meta-chip-icon">片</span>
+                  <span class="meta-chip-val" id="backKatakana">-</span>
+                </div>
               </div>
 
-              <!-- Vocabulary Association -->
-              <div class="vocab-association-container" id="vocabContainer" style="display: none;">
-                <img id="vocabImg" src="" alt="" style="display: none;">
-                <div class="vocab-info">
+              <!-- Center column: Stroke animation or romaji answer -->
+              <div class="back-col back-col-center">
+                <div class="back-answer" id="cardAnswerDisplay">a</div>
+              </div>
+
+              <!-- Right column: Vocabulary association -->
+              <div class="back-col back-col-right" id="backRightCol">
+                <div class="vocab-inline" id="vocabContainer" style="display: none;">
                   <span class="vocab-title">單字聯想</span>
                   <span class="vocab-word" id="vocabWordText">朝 (あさ)</span>
                   <span class="vocab-meaning" id="vocabMeaningText">早上 (asa)</span>
                 </div>
               </div>
             </div>
+
+            <!-- Hidden audio elements (kept for functionality) -->
+            <button class="audio-fab" id="playAudioBtn" aria-label="播放發音" style="display: none;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+              <span class="speech-indicator" id="speechWave" style="display:none;">
+                <span class="speech-bar"></span>
+                <span class="speech-bar"></span>
+                <span class="speech-bar"></span>
+              </span>
+            </button>
+            <div class="stroke-anim-container" id="strokeAnimContainer" style="display: none;">
+              <div id="strokeSvgHolder" style="width: 52px; height: 52px; pointer-events: none;"></div>
+            </div>
+            <img id="vocabImg" src="" alt="" style="display: none;">
           </div>
         </div>
       </div>
@@ -374,7 +373,7 @@
     </div>
   </div>
 
-  <script src="kana.js?v=5"></script>
-  <script src="app.js?v=5"></script>
+  <script src="kana.js?v=9"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>

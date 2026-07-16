@@ -92,6 +92,9 @@ const cardGroupHint = document.getElementById('cardGroupHint');
 const cardAnswerDisplay = document.getElementById('cardAnswerDisplay');
 const backHiragana = document.getElementById('backHiragana');
 const backKatakana = document.getElementById('backKatakana');
+const backHiraganaChip = document.getElementById('backHiraganaChip');
+const backKatakanaChip = document.getElementById('backKatakanaChip');
+const backRomajiLabel = document.getElementById('backRomajiLabel');
 const playAudioBtn = document.getElementById('playAudioBtn');
 const speechWave = document.getElementById('speechWave');
 
@@ -783,6 +786,10 @@ function nextCard() {
   cardAnswerDisplay.classList.remove('stroke-center');
   if (backHiragana) backHiragana.textContent = '';
   if (backKatakana) backKatakana.textContent = '';
+  if (backHiraganaChip) backHiraganaChip.style.display = 'flex';
+  if (backKatakanaChip) backKatakanaChip.style.display = 'flex';
+  if (backRomajiLabel) backRomajiLabel.textContent = '';
+  if (vocabContainer) vocabContainer.style.display = 'none';
   
   updateUI();
   
@@ -839,6 +846,13 @@ function checkAnswer(isTimeout = false) {
     yoon: '拗音'
   }[state.currentCard.type];
   
+  // Reset and update text contents, ensuring both chips are visible by default
+  if (backHiragana) backHiragana.textContent = state.currentCard.hiragana;
+  if (backKatakana) backKatakana.textContent = state.currentCard.katakana;
+  if (backHiraganaChip) backHiraganaChip.style.display = 'flex';
+  if (backKatakanaChip) backKatakanaChip.style.display = 'flex';
+  if (backRomajiLabel) backRomajiLabel.textContent = state.currentCard.romaji;
+  
   // Show stroke order animation when correct, romaji when incorrect
   if (isCorrect) {
     cardAnswerDisplay.textContent = '';
@@ -851,12 +865,17 @@ function checkAnswer(isTimeout = false) {
       cardAnswerDisplay.classList.remove('stroke-center');
       cardAnswerDisplay.textContent = state.currentCard.displayKana;
     }
+    
+    // Hide the redundant tag that is already shown in the center stroke order animation
+    if (state.currentCard.displayKana === state.currentCard.hiragana) {
+      if (backHiraganaChip) backHiraganaChip.style.display = 'none';
+    } else if (state.currentCard.displayKana === state.currentCard.katakana) {
+      if (backKatakanaChip) backKatakanaChip.style.display = 'none';
+    }
   } else {
     cardAnswerDisplay.classList.remove('stroke-center');
     cardAnswerDisplay.textContent = state.currentCard.romaji;
   }
-  if (backHiragana) backHiragana.textContent = state.currentCard.hiragana;
-  if (backKatakana) backKatakana.textContent = state.currentCard.katakana;
   
   // Set ghost kana watermark
   if (backKanaGhost) {
@@ -886,19 +905,15 @@ function checkAnswer(isTimeout = false) {
   // Hide separate stroke container in bottom row (stroke is shown in center now)
   if (strokeAnimContainer) strokeAnimContainer.style.display = 'none';
   
-  // Load Vocabulary association (image removed)
+  // Load Vocabulary association into right column
   if (vocabContainer) {
     if (state.currentCard.vocab) {
       vocabContainer.style.display = 'flex';
-      if (vocabImg) vocabImg.style.display = 'none';
-      
       vocabWordText.textContent = `${state.currentCard.vocab.word} (${state.currentCard.vocab.reading})`;
       vocabMeaningText.textContent = `${state.currentCard.vocab.meaning} (${state.currentCard.vocab.romaji})`;
     } else {
       vocabContainer.style.display = 'none';
     }
-  } else {
-    if (vocabContainer) vocabContainer.style.display = 'none';
   }
   
   if (isCorrect) {
