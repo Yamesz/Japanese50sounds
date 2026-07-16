@@ -90,8 +90,8 @@ const cardKanaTypeHint = document.getElementById('cardKanaTypeHint');
 const cardKanaDisplay = document.getElementById('cardKanaDisplay');
 const cardGroupHint = document.getElementById('cardGroupHint');
 const cardAnswerDisplay = document.getElementById('cardAnswerDisplay');
-const backRowHint = document.getElementById('backRowHint');
-const backTypeHint = document.getElementById('backTypeHint');
+const backHiragana = document.getElementById('backHiragana');
+const backKatakana = document.getElementById('backKatakana');
 const playAudioBtn = document.getElementById('playAudioBtn');
 const speechWave = document.getElementById('speechWave');
 
@@ -781,8 +781,8 @@ function nextCard() {
   cardAnswerDisplay.textContent = '';
   cardAnswerDisplay.innerHTML = '';
   cardAnswerDisplay.classList.remove('stroke-center');
-  backRowHint.textContent = '';
-  backTypeHint.textContent = '';
+  if (backHiragana) backHiragana.textContent = '';
+  if (backKatakana) backKatakana.textContent = '';
   
   updateUI();
   
@@ -855,8 +855,8 @@ function checkAnswer(isTimeout = false) {
     cardAnswerDisplay.classList.remove('stroke-center');
     cardAnswerDisplay.textContent = state.currentCard.romaji;
   }
-  backRowHint.textContent = ROW_LABELS[state.currentCard.row] ? ROW_LABELS[state.currentCard.row] : state.currentCard.row;
-  backTypeHint.textContent = typeText;
+  if (backHiragana) backHiragana.textContent = state.currentCard.hiragana;
+  if (backKatakana) backKatakana.textContent = state.currentCard.katakana;
   
   // Set ghost kana watermark
   if (backKanaGhost) {
