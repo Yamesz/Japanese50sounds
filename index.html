@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>50音日文學習助手 - Gojūon Master</title>
   <meta name="description" content="一個現代化、漂亮的日文50音學習助手，支援單字卡功能（Anki模式）、錯題複習、發音功能與進度追蹤。">
-  <link rel="stylesheet" href="styles.css?v=17">
+  <link rel="stylesheet" href="styles.css?v=19">
 </head>
 
 <body>
@@ -299,6 +299,43 @@
           <button id="submitBtn" class="primary-btn">送出</button>
         </div>
       </div>
+
+      <!-- Mobile Virtual Keyboard (Hidden on Desktop) -->
+      <div class="virtual-keyboard" id="virtualKeyboard">
+        <div class="vk-row">
+          <button class="vk-key" data-key="q">Q</button>
+          <button class="vk-key" data-key="w">W</button>
+          <button class="vk-key" data-key="e">E</button>
+          <button class="vk-key" data-key="r">R</button>
+          <button class="vk-key" data-key="t">T</button>
+          <button class="vk-key" data-key="y">Y</button>
+          <button class="vk-key" data-key="u">U</button>
+          <button class="vk-key" data-key="i">I</button>
+          <button class="vk-key" data-key="o">O</button>
+          <button class="vk-key" data-key="p">P</button>
+        </div>
+        <div class="vk-row vk-row-center">
+          <button class="vk-key" data-key="a">A</button>
+          <button class="vk-key" data-key="s">S</button>
+          <button class="vk-key" data-key="d">D</button>
+          <button class="vk-key" data-key="f">F</button>
+          <button class="vk-key" data-key="g">G</button>
+          <button class="vk-key" data-key="h">H</button>
+          <button class="vk-key" data-key="j">J</button>
+          <button class="vk-key" data-key="k">K</button>
+          <button class="vk-key" data-key="l">L</button>
+        </div>
+        <div class="vk-row">
+          <button class="vk-key" data-key="z">Z</button>
+          <button class="vk-key" data-key="x">X</button>
+          <button class="vk-key" data-key="c">C</button>
+          <button class="vk-key" data-key="v">V</button>
+          <button class="vk-key" data-key="b">B</button>
+          <button class="vk-key" data-key="n">N</button>
+          <button class="vk-key" data-key="m">M</button>
+          <button class="vk-key vk-key-action" data-key="backspace">⌫</button>
+        </div>
+      </div>
     </section>
 
     <!-- Sidebar Right: Stats and Incorrect Reviews -->
@@ -430,7 +467,7 @@
   </div>
 
   <script src="kana.js?v=9"></script>
-  <script src="app.js?v=19"></script>
+  <script src="app.js?v=20"></script>
 </body>
 
 </html>

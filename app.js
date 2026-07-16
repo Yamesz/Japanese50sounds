@@ -1659,6 +1659,16 @@ init();
   // Responsive sidebar movement logic
   function handleResponsiveLayout() {
     const isMobile = window.innerWidth <= 768;
+    
+    // Manage input mode to prevent native keyboard popup on mobile
+    if (romajiInput) {
+      if (isMobile) {
+        romajiInput.setAttribute('readonly', 'true');
+      } else {
+        romajiInput.removeAttribute('readonly');
+      }
+    }
+
     if (isMobile) {
       // Move the sidebars into the drawer panel body
       if (configSidebar && configSidebar.parentNode !== mobileDrawerBody) {
@@ -1681,5 +1691,33 @@ init();
 
   window.addEventListener('resize', handleResponsiveLayout);
   handleResponsiveLayout();
+})();
+
+// --- VIRTUAL KEYBOARD LOGIC ---
+(function setupVirtualKeyboard() {
+  const vkKeys = document.querySelectorAll('.vk-key');
+  const romajiInput = document.getElementById('romajiInput');
+
+  if (!romajiInput) return;
+
+  vkKeys.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // Prevent focus stealing
+      e.preventDefault();
+      
+      const key = btn.getAttribute('data-key');
+      if (!key) return;
+
+      if (key === 'backspace') {
+        romajiInput.value = romajiInput.value.slice(0, -1);
+      } else {
+        romajiInput.value += key;
+      }
+      
+      // Since it's readonly on mobile, we don't strictly need to focus,
+      // but let's dispatch an input event in case anything relies on it
+      romajiInput.dispatchEvent(new Event('input'));
+    });
+  });
 })();
 
